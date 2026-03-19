@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Mothersday</title>
+  <style>
+    /* RESET & GLOBAL STYLES - soft, clean, minimalist */
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      min-height: 100vh;
+      background-color: #fff9f0;  /* warm cream */
+      font-family: 'Segoe UI', Roboto, 'Helvetica Neue', sans-serif;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      margin: 0;
+      padding: 16px;
+      /* subtle texture - tiny noise for warmth */
+      background-image: radial-gradient(rgba(255, 220, 200, 0.2) 1px, transparent 1px);
+      background-size: 30px 30px;
+      position: relative;
+      overflow-x: hidden;
+    }
+
+    /* confetti canvas - sits on top of everything */
+    #confetti-canvas {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;  /* allows clicks to pass through to buttons */
+      z-index: 9999;         /* ensures confetti is above all content */
+    }
+
+    /* main card - holds everything beneath confetti */
+    .card {
+      max-width: 650px;
+      width: 100%;
+      background: rgba(255, 245, 235, 0.5);
+      backdrop-filter: blur(2px);
+      border-radius: 48px 48px 32px 32px;
+      padding: 32px 20px 48px 20px;
+      box-shadow: 0 20px 40px -15px rgba(0,0,0,0.1);
+      text-align: center;
+      position: relative;
+      z-index: 1;            /* sits below confetti */
+    }
+
+    /* message to mum */
+    .greeting {
+      font-size: 1.8rem;
+      letter-spacing: 1px;
+      color: #b4654a;
+      margin-bottom: 10px;
+      font-weight: 300;
+      text-shadow: 2px 2px 0 rgba(255, 215, 200, 0.5);
+    }
+    .greeting span {
+      font-size: 2rem;
+      display: inline-block;
+    }
+
+    /* container for the dangling image & cone effect */
+    .dangle-container {
+      position: relative;
+      width: 260px;
+      height: 260px;
+      margin: 30px auto 25px auto;  /* centered */
+      /* the dangling animation - subtle and slow */
+      animation: dangle 6s ease-in-out infinite;
+      transform-origin: top center;  /* swing from top like a pendant */
+      filter: drop-shadow(0 12px 12px rgba(0,0,0,0.08));
+      z-index: 2;            /* above card bg but below confetti */
+    }
+
+    /* the actual image in a circular frame */
+    .dangle-container img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;          /* ensures image fills circle without distortion */
+      border-radius: 50%;         /* perfect circle */
+      display: block;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+      position: relative;
+      z-index: 3;                 /* above cone background */
+    }
+
+    /* colorful cone effect - sits on top of image */
+    .dangle-container::before {
+      content: '';
+      position: absolute;
+      top: -30px;                /* start a bit above container to create "cone from top-left" origin */
+      left: -30px;
+      width: 130%;               /* larger than container so gradient covers entire image */
+      height: 130%;
+      background: conic-gradient(
+        from 0deg at 20% 20%,    /* origin near top-left of container */
+        rgba(255, 200, 220, 0.7) 0deg,    /* soft pink */
+        rgba(230, 210, 255, 0.7) 90deg,   /* lavender */
+        rgba(255, 220, 180, 0.7) 180deg,  /* peach */
+        rgba(255, 240, 200, 0.7) 240deg,  /* soft yellow */
+        rgba(255, 200, 220, 0.7) 360deg   /* back to pink */
+      );
+      filter: blur(18px);         /* soft, dreamy cone — like light spreading */
+      mix-blend-mode: overlay;    /* blends colors with image: vibrant but gentle */
+      border-radius: 50%;         /* keep the shape rounded, but it's a cone of light */
+      z-index: 4;                 /* sits on top of image */
+      pointer-events: none;       /* so clicks pass through */
+      /* animation to shift colors slowly */
+      animation: colorShift 14s infinite alternate ease-in-out;
+    }
+
+    /* subtle extra glow enhancement */
+    .dangle-container::after {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at 0% 0%, rgba(255,230,210,0.3) 0%, transparent 70%);
+      border-radius: 50%;
+      z-index: 5;                /* subtle extra glow above cone */
+      pointer-events: none;
+      mix-blend-mode: screen;
+    }
+
+    /* DANGLE animation: very slow side-to-side */
+    @keyframes dangle {
+      0% { transform: rotate(0deg); }
+      25% { transform: rotate(1.8deg); }   /* slight right tilt */
+      50% { transform: rotate(0deg); }
+      75% { transform: rotate(-1.8deg); }  /* slight left tilt */
+      100% { transform: rotate(0deg); }
+    }
+
+    /* color shift animation for the cone gradient */
+    @keyframes colorShift {
+      0% {
+        filter: blur(20px) hue-rotate(0deg);
+        opacity: 0.7;
+      }
+      50% {
+        filter: blur(22px) hue-rotate(8deg);  /* very subtle hue change */
+        opacity: 0.8;
+      }
+      100% {
+        filter: blur(20px) hue-rotate(-8deg);
+        opacity: 0.7;
+      }
+    }
+
+    /* simple audio button — elegant, discreet */
+    .music-button {
+      background: rgba(230, 210, 200, 0.5);
+      backdrop-filter: blur(8px);
+      border: 1px solid rgba(255, 240, 230, 0.8);
+      color: #7a4e3a;
+      font-size: 1.1rem;
+      padding: 12px 28px;
+      border-radius: 60px;
+      cursor: pointer;
+      box-shadow: 0 4px 12px rgba(0,0,0,0.03);
+      transition: all 0.3s ease;
+      font-weight: 300;
+      letter-spacing: 1px;
+      margin-top: 10px;
+      border: none;
+      display: inline-block;
+      position: relative;
+      z-index: 10;             /* above card but below confetti - confetti is 9999 */
+    }
+
+    .music-button:hover {
+      background: rgba(220, 190, 175, 0.7);
+      color: #4d3324;
+      transform: scale(1.02);
+      box-shadow: 0 8px 20px rgba(0,0,0,0.06);
+    }
+
+    /* hidden utility */
+    .hidden {
+      display: none;
+    }
+
+    /* tiny footer / note */
+    .foot-note {
+      margin-top: 36px;
+      font-size: 0.9rem;
+      color: #b99e8f;
+      font-style: italic;
+      position: relative;
+      z-index: 10;
+    }
+
+    /* responsive: smaller screen adjustments */
+    @media (max-width: 780px) {
+      .greeting {
+        font-size: 1.5rem;
+      }
+      .dangle-container {
+        width: 200px;
+        height: 200px;
+      }
+      .card {
+        padding: 20px 12px 40px;
+      }
+      .music-button {
+        font-size: 1rem;
+        padding: 10px 22px;
+      }
+    }
+
+  </style>
+</head>
+<body>
+  <!-- Confetti canvas - fixed, covers everything, pointer-events: none so clicks go through -->
+  <canvas id="confetti-canvas"></canvas>
+
+  <div class="card">
+    <!-- warm message -->
+    <div class="greeting" style="font-weight: bold;">
+      <span>🌸</span> Happy Mother's Day, Mum <span>🌸</span><br>
+      <span style="font-size: 1.2rem; color: #b77f68;">With all our love</span> <br>
+      <span style="font-size: 1.2rem; color: #ff04de;">(Angel & Alexis)</span>
+    </div>
+
+    <!-- dangling image container: insert your mum.jpg here -->
+    <div class="dangle-container">
+      <!-- your image - make sure the file is named mum.jpg and in same folder -->
+      <img src="mum.jpg" alt="My beautiful mum" onerror="this.src='https://via.placeholder.com/300/fff9f0/b4654a?text=Mum'; this.alt='Placeholder - please add mum.jpg'">
+    </div>
+
+    <!-- Play button (initially hidden – will appear if autoplay fails) -->
+    <button id="playMusicBtn" class="music-button hidden">🎵  play gentle music  🎵</button>
+
+    <!-- hidden audio element -->
+    <audio id="bgAudio" loop preload="auto">
+      <source src="mothersday.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+
+  <script>
+    (function() {
+      "use strict";
+
+      // ==================== CONFETTI EFFECT (auto-run, top layer) ====================
+      (function setupConfetti() {
+        const canvas = document.getElementById('confetti-canvas');
+        if (!canvas) return;
+
+        const ctx = canvas.getContext('2d');
+        let width, height;
+        let particles = [];
+        const particleCount = 180;  // generous but not overwhelming
+        
+        // get random pastel / happy colors
+        const colors = [
+          '#f9d7e0', // soft pink
+          '#fde2c4', // peach
+          '#f5c6aa', // light peach
+          '#d9d0f0', // lavender
+          '#fce6b4', // soft yellow
+          '#c9e4de', // mint
+          '#fbc8d5', // rose
+          '#feebe0', // cream
+          '#d6e2e9', // light blue
+          '#f9dbbd'  // champagne
+        ];
+
+        // utility to resize canvas
+        function resizeCanvas() {
+          width = window.innerWidth;
+          height = window.innerHeight;
+          canvas.width = width;
+          canvas.height = height;
+        }
+
+        // particle class
+        class ConfettiParticle {
+          constructor() {
+            this.x = Math.random() * width;
+            this.y = Math.random() * height - height; // start above screen
+            this.size = Math.random() * 8 + 4; // 4-12px
+            this.speedY = Math.random() * 3 + 2; // fall speed
+            this.speedX = Math.random() * 1.5 - 0.75; // drift left/right
+            this.color = colors[Math.floor(Math.random() * colors.length)];
+            this.rotation = Math.random() * 360;
+            this.rotationSpeed = (Math.random() - 0.5) * 0.02;
+            this.opacity = Math.random() * 0.6 + 0.3; // 0.3-0.9
+            this.shape = Math.random() > 0.5 ? 'circle' : 'rectangle'; // mix shapes
+          }
+
+          update() {
+            this.y += this.speedY;
+            this.x += this.speedX;
+            this.rotation += this.rotationSpeed;
+
+            // reset when off screen
+            if (this.y > height + 20) {
+              this.y = -20;
+              this.x = Math.random() * width;
+            }
+            if (this.x < -20) this.x = width + 20;
+            if (this.x > width + 20) this.x = -20;
+          }
+
+          draw() {
+            if (!ctx) return;
+            ctx.save();
+            ctx.translate(this.x, this.y);
+            ctx.rotate(this.rotation);
+            ctx.globalAlpha = this.opacity;
+            ctx.fillStyle = this.color;
+
+            if (this.shape === 'circle') {
+              // circle confetti
+              ctx.beginPath();
+              ctx.arc(0, 0, this.size / 2, 0, Math.PI * 2);
+              ctx.fill();
+            } else {
+              // rectangle confetti (like tiny pieces)
+              ctx.fillRect(-this.size/2, -this.size/4, this.size, this.size/2);
+            }
+            
+            ctx.restore();
+          }
+        }
+
+        // initialize particles
+        function initParticles() {
+          particles = [];
+          for (let i = 0; i < particleCount; i++) {
+            particles.push(new ConfettiParticle());
+          }
+        }
+
+        // animation loop
+        function animate() {
+          if (!ctx) return;
+          ctx.clearRect(0, 0, width, height);
+          
+          particles.forEach(p => {
+            p.update();
+            p.draw();
+          });
+          
+          requestAnimationFrame(animate);
+        }
+
+        // handle resize
+        window.addEventListener('resize', () => {
+          resizeCanvas();
+          // reposition particles to avoid clustering at edges, but keep them roughly
+          particles.forEach(p => {
+            // scale x proportionally to new width
+            if (width > 0 && height > 0) {
+              // avoid going out of bounds too drastically; simple clamp
+              p.x = Math.min(width, Math.max(0, p.x));
+              p.y = Math.min(height + 50, p.y);
+            }
+          });
+        });
+
+        // start everything
+        resizeCanvas();
+        initParticles();
+        animate();
+
+        // occasionally add a tiny variation to keep it fresh (optional)
+        setInterval(() => {
+          // add a new particle to replace one that might clump
+          if (particles.length < particleCount + 10) {
+            particles.push(new ConfettiParticle());
+          }
+          // remove excess if too many
+          if (particles.length > particleCount + 15) {
+            particles.splice(0, 5);
+          }
+        }, 2000);
+      })();
+
+      // ==================== AUDIO / MUSIC (same as before) ====================
+      const audio = document.getElementById('bgAudio');
+      const playBtn = document.getElementById('playMusicBtn');
+
+      function startMusic() {
+        audio.play()
+          .then(() => {
+            playBtn.classList.add('hidden');
+            console.log('🎶 Music is playing');
+          })
+          .catch(error => {
+            console.log('Playback failed:', error);
+            if (playBtn.classList.contains('hidden')) {
+              playBtn.classList.remove('hidden');
+            }
+          });
+      }
+
+      function attemptAutoplay() {
+        audio.play()
+          .then(() => {
+            console.log('✅ Autoplay successful');
+            playBtn.classList.add('hidden');
+          })
+          .catch(error => {
+            console.log('⛔ Autoplay blocked. Showing play button.');
+            playBtn.classList.remove('hidden');
+          });
+      }
+
+      attemptAutoplay();
+
+      playBtn.addEventListener('click', function() {
+        startMusic();
+      });
+
+      audio.addEventListener('error', function() {
+        console.warn('⚠️ Audio file not found. Please put mothersday.mp3 in the folder.');
+        playBtn.textContent = '🎵 (music file missing)';
+      });
+
+      audio.addEventListener('playing', function() {
+        playBtn.classList.add('hidden');
+      });
+
+      window.addEventListener('load', function() {
+        setTimeout(() => {
+          if (audio.paused && playBtn.classList.contains('hidden')) {
+            playBtn.classList.remove('hidden');
+          }
+        }, 1200);
+      });
+    })();
+  </script>
+</body>
+</html>
